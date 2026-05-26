@@ -1,0 +1,34 @@
+mainmenu "Cyberbrick L-ONE Robotic Arm"
+
+config CYBERBRICK_WIFI_SSID
+    string "WiFi SSID"
+    default "MyNetwork"
+    help
+      WiFi network name to connect to.
+
+config CYBERBRICK_WIFI_PASSWORD
+    string "WiFi password"
+    default "MyPassword"
+    help
+      WiFi network password.
+
+config CYBERBRICK_WEB_PORT
+    int "Web server port"
+    default 80
+    range 1 65535
+    help
+      TCP port for the embedded HTTP server.
+
+config CYBERBRICK_SERVO_MIN_US
+    int "Servo minimum pulse width (microseconds)"
+    default 500
+    help
+      Pulse width in us corresponding to 0 degrees.
+
+config CYBERBRICK_SERVO_MAX_US
+    int "Servo maximum pulse width (microseconds)"
+    default 2500
+    help
+      Pulse width in us corresponding to 180 degrees.
+
+source "Kconfig.zephyr"

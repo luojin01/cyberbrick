@@ -1,0 +1,84 @@
+/*
+ * ESP32-S3 Super Mini — Cyberbrick L-ONE overlay
+ *
+ * Pin assignments (adjust to match your wiring):
+ *   Servo 0 → GPIO 1  (LEDC channel 0)
+ *   Servo 1 → GPIO 9  (LEDC channel 1)
+ *   Servo 2 → GPIO 2  (LEDC channel 2)
+ *   DC motor IN1 → GPIO 10
+ *   DC motor IN2 → GPIO 11
+ */
+
+#include <zephyr/dt-bindings/pwm/pwm.h>
+
+/ {
+    chosen {
+        zephyr,console = &usb_serial;
+        zephyr,shell-uart = &usb_serial;
+        zephyr,uart-mcumgr = &usb_serial;
+    };
+
+    aliases {
+        servo0   = &servo_ch0;
+        servo1   = &servo_ch1;
+        servo2   = &servo_ch2;
+    };
+
+    servo_pwms {
+        compatible = "pwm-leds";
+        status = "okay";
+
+        /* 20 ms period = 50 Hz, matching standard hobby servo */
+        servo_ch0: servo_0 {
+            pwms = <&ledc0 0 20000000 PWM_POLARITY_NORMAL>;
+        };
+        servo_ch1: servo_1 {
+            pwms = <&ledc0 1 20000000 PWM_POLARITY_NORMAL>;
+        };
+        servo_ch2: servo_2 {
+            pwms = <&ledc0 2 20000000 PWM_POLARITY_NORMAL>;
+        };
+    };
+
+    /* DC motor GPIO lines accessed via zephyr,user */
+    zephyr_user: zephyr,user {
+        motor-in1-gpios = <&gpio0 10 GPIO_ACTIVE_HIGH>;
+        motor-in2-gpios = <&gpio0 11 GPIO_ACTIVE_HIGH>;
+    };
+};
+
+&ledc0 {
+    pinctrl-0 = <&ledc0_default>;
+    pinctrl-names = "default";
+    status = "okay";
+    #address-cells = <1>;
+    #size-cells = <0>;
+
+    channel0@0 {
+        reg = <0x0>;
+        timer = <0>;
+    };
+    channel1@1 {
+        reg = <0x1>;
+        timer = <0>;
+    };
+    channel2@2 {
+        reg = <0x2>;
+        timer = <0>;
+    };
+};
+
+&pinctrl {
+    ledc0_default: ledc0_default {
+        group1 {
+            pinmux = <LEDC_CH0_GPIO1>,
+                     <LEDC_CH1_GPIO9>,
+                     <LEDC_CH2_GPIO2>;
+            output-enable;
+        };
+    };
+};
+
+&usb_serial {
+    status = "okay";
+};
