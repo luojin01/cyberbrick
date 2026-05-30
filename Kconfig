@@ -1,16 +1,36 @@
 mainmenu "Cyberbrick L-ONE Robotic Arm"
 
 config CYBERBRICK_WIFI_SSID
-    string "WiFi SSID"
-    default "MyNetwork"
+    string "SoftAP SSID"
+    default "cyberbrick"
     help
-      WiFi network name to connect to.
+      SSID broadcast by the on-board WiFi Access Point.
 
 config CYBERBRICK_WIFI_PASSWORD
-    string "WiFi password"
-    default "MyPassword"
+    string "SoftAP password (WPA2-PSK, empty = open network)"
+    default "cyberbrick"
     help
-      WiFi network password.
+      WPA2-PSK passphrase. Must be 8..63 characters, or empty for an
+      open (no-security) network.
+
+config CYBERBRICK_WIFI_CHANNEL
+    int "SoftAP 2.4 GHz channel"
+    default 6
+    range 1 13
+    help
+      WiFi channel for the SoftAP. 1, 6, and 11 are non-overlapping.
+
+config CYBERBRICK_AP_IP
+    string "SoftAP IPv4 address (gateway)"
+    default "192.168.4.1"
+    help
+      Static IPv4 address assigned to the AP interface. Clients reach
+      the web UI at http://<this address>/. The DHCP pool starts 10
+      addresses above this and serves the next 8 addresses.
+
+config CYBERBRICK_AP_NETMASK
+    string "SoftAP IPv4 netmask"
+    default "255.255.255.0"
 
 config CYBERBRICK_WEB_PORT
     int "Web server port"

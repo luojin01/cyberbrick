@@ -1,0 +1,87 @@
+/*
+ * Seeed Studio XIAO ESP32-S3 — Cyberbrick L-ONE overlay
+ *
+ * XIAO header pinout (silkscreen → GPIO):
+ *   D0 = GPIO1   D1 = GPIO2   D2 = GPIO3
+ *   D3 = GPIO4   D4 = GPIO5*  D5 = GPIO6*   (* I2C SDA/SCL)
+ *   D6 = GPIO43  D7 = GPIO44  (UART0 TX/RX)
+ *   D8 = GPIO7   D9 = GPIO8   D10 = GPIO9
+ *
+ * Cyberbrick pin assignments:
+ *   Servo 0      → D0 / GPIO 1  (LEDC channel 0)
+ *   Servo 1      → D1 / GPIO 2  (LEDC channel 1)
+ *   Servo 2      → D2 / GPIO 3  (LEDC channel 2)
+ *   DC motor IN1 → D3 / GPIO 4
+ *   DC motor IN2 → D8 / GPIO 7
+ *
+ * Console is the built-in USB-C native USB Serial/JTAG (already chosen by
+ * the in-tree board DTS), so a single cable provides flash + log + shell.
+ */
+
+#include <zephyr/dt-bindings/pwm/pwm.h>
+
+/ {
+    aliases {
+        servo0 = &servo_ch0;
+        servo1 = &servo_ch1;
+        servo2 = &servo_ch2;
+    };
+
+    servo_pwms {
+        compatible = "pwm-leds";
+        status = "okay";
+
+        /* 20 ms period = 50 Hz hobby servo standard */
+        servo_ch0: servo_0 {
+            pwms = <&ledc0 0 20000000 PWM_POLARITY_NORMAL>;
+        };
+        servo_ch1: servo_1 {
+            pwms = <&ledc0 1 20000000 PWM_POLARITY_NORMAL>;
+        };
+        servo_ch2: servo_2 {
+            pwms = <&ledc0 2 20000000 PWM_POLARITY_NORMAL>;
+        };
+    };
+
+    /* DC motor GPIO lines accessed via zephyr,user */
+    zephyr_user: zephyr,user {
+        motor-in1-gpios = <&gpio0 4 GPIO_ACTIVE_HIGH>;
+        motor-in2-gpios = <&gpio0 7 GPIO_ACTIVE_HIGH>;
+    };
+};
+
+&ledc0 {
+    pinctrl-0 = <&ledc0_default>;
+    pinctrl-names = "default";
+    status = "okay";
+    #address-cells = <1>;
+    #size-cells = <0>;
+
+    channel0@0 {
+        reg = <0x0>;
+        timer = <0>;
+    };
+    channel1@1 {
+        reg = <0x1>;
+        timer = <0>;
+    };
+    channel2@2 {
+        reg = <0x2>;
+        timer = <0>;
+    };
+};
+
+&pinctrl {
+    ledc0_default: ledc0_default {
+        group1 {
+            pinmux = <LEDC_CH0_GPIO1>,
+                     <LEDC_CH1_GPIO2>,
+                     <LEDC_CH2_GPIO3>;
+            output-enable;
+        };
+    };
+};
+
+&usb_serial {
+    status = "okay";
+};
